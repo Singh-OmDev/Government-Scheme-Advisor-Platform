@@ -1,8 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Languages } from 'lucide-react';
-import { SignedIn, SignedOut, UserButton } from "@clerk/clerk-react";
-import { Link } from "react-router-dom";
 
 const Header = ({ language, setLanguage }) => {
     const toggleLanguage = () => {
@@ -29,23 +27,11 @@ const Header = ({ language, setLanguage }) => {
                         <Languages className="w-4 h-4" />
                         {language === 'en' ? 'हिंदी' : 'English'}
                     </button>
-
-                    <SignedOut>
-                        <Link
-                            to="/sign-in"
-                            className="bg-blue-600 hover:bg-blue-500 text-white px-4 py-1.5 rounded-full text-sm font-medium transition-colors"
-                        >
-                            Sign In
-                        </Link>
-                    </SignedOut>
-
-                    <SignedIn>
-                        <UserButton afterSignOutUrl="/" />
-                    </SignedIn>
+                
                 </div>
             </div>
         </header>
-    );
+    )
 };
 
 export default Header;

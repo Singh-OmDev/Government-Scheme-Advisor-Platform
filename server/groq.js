@@ -69,7 +69,11 @@ Special Conditions: ${userProfile.specialConditions ? userProfile.specialConditi
       response_format: { type: "json_object" }
     });
 
-    const jsonString = completion.choices[0]?.message?.content || "{}";
+    let jsonString = completion.choices[0]?.message?.content || "{}";
+    // Check if the response contains markdown code blocks
+    if (jsonString.includes("```")) {
+      jsonString = jsonString.replace(/```json|```/g, "").trim();
+    }
     return JSON.parse(jsonString);
   } catch (error) {
     console.error("Error calling Groq API:", error);

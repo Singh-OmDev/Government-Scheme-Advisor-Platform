@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useAuth } from '@clerk/clerk-react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import InputForm from '../components/InputForm';
@@ -16,7 +15,6 @@ function HomePage() {
     const [error, setError] = useState(null);
     const [showResults, setShowResults] = useState(false);
     const [language, setLanguage] = useState('en');
-    const { getToken } = useAuth();
 
     const t = translations[language];
 
@@ -32,8 +30,7 @@ function HomePage() {
         setError(null);
         setShowResults(false);
         try {
-            const token = await getToken();
-            const data = await recommendSchemes({ ...userProfile, language }, token);
+            const data = await recommendSchemes({ ...userProfile, language });
             if (data.schemes) {
                 setSchemes(data.schemes);
                 setGeneralAdvice(data.generalAdvice || []);

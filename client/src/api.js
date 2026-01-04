@@ -1,17 +1,12 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_URL = import.meta.env.VITE_API_URL || '/api';
 
-export const recommendSchemes = async (userProfile, token) => {
+export const recommendSchemes = async (userProfile) => {
     try {
-        const headers = {
-            'Content-Type': 'application/json',
-        };
-        if (token) {
-            headers['Authorization'] = `Bearer ${token}`;
-        }
-
         const response = await fetch(`${API_URL}/recommend-schemes`, {
             method: 'POST',
-            headers: headers,
+            headers: {
+                'Content-Type': 'application/json',
+            },
             body: JSON.stringify(userProfile),
         });
 
@@ -26,18 +21,13 @@ export const recommendSchemes = async (userProfile, token) => {
     }
 };
 
-export const chatWithScheme = async (scheme, question, language, token) => {
+export const chatWithScheme = async (scheme, question, language) => {
     try {
-        const headers = {
-            'Content-Type': 'application/json',
-        };
-        if (token) {
-            headers['Authorization'] = `Bearer ${token}`;
-        }
-
         const response = await fetch(`${API_URL}/chat-scheme`, {
             method: 'POST',
-            headers: headers,
+            headers: {
+                'Content-Type': 'application/json',
+            },
             body: JSON.stringify({ scheme, question, language }),
         });
 

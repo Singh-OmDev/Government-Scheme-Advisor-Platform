@@ -1,15 +1,17 @@
-const fetch = require('node-fetch'); // You might need to install node-fetch if not present, or use built-in fetch in newer node
-// If node version is new enough (18+), fetch is global.
-// Let's assume fetch is global or we use http.
-
 const http = require('http');
 
 const data = JSON.stringify({
-    age: 25,
-    gender: "Male",
-    state: "Delhi",
-    annualIncome: "500000",
-    occupation: "Student"
+    name: 'Om Singh',
+    age: '21',
+    gender: 'Male',
+    state: 'Uttar Pradesh',
+    city: '',
+    annualIncome: 'Less than 1 Lakh',
+    category: 'General',
+    occupation: 'Student',
+    educationLevel: 'Graduate',
+    specialConditions: [],
+    language: 'en'
 });
 
 const options = {
@@ -23,11 +25,17 @@ const options = {
     }
 };
 
+console.log("Sending request with data:", data);
+
 const req = http.request(options, (res) => {
     console.log(`STATUS: ${res.statusCode}`);
     res.setEncoding('utf8');
+    let chunks = "";
     res.on('data', (chunk) => {
-        console.log(`BODY: ${chunk}`);
+        chunks += chunk;
+    });
+    res.on('end', () => {
+        console.log(`BODY: ${chunks}`);
     });
 });
 
