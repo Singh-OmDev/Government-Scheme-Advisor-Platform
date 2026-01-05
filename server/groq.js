@@ -36,6 +36,8 @@ Output JSON with this exact structure:
       "requiredDocuments": ["Doc 1", "Doc 2"],
       "applicationSteps": ["Step 1", "Step 2"],
       "benefits": ["Benefit 1", "Benefit 2"],
+      "application_url": "https://official-website-link.gov.in or 'N/A'",
+      "deadline": "YYYY-MM-DD or 'Open' or 'N/A'",
       "usefulnessScore": 85
     }
   ],

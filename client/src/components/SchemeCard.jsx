@@ -60,8 +60,16 @@ const SchemeCard = ({ scheme, index, t, language }) => {
                         </h3>
                     </div>
                     <div className="flex flex-col items-end gap-2">
-                        <div className="flex items-center gap-1 text-xs text-blue-300 bg-blue-500/10 px-2 py-1 rounded-md border border-blue-500/20 print:text-blue-600 print:border-blue-600">
-                            <span className="font-bold">{scheme.usefulnessScore}%</span> {t.match}
+                        <div className="flex items-center gap-2">
+                            {scheme.deadline &&
+                                !['n/a', 'varies', 'check', 'unknown', 'various'].some(bad => scheme.deadline.toLowerCase().includes(bad)) && (
+                                    <div className="text-[10px] text-red-300 bg-red-500/10 px-2 py-0.5 rounded border border-red-500/20 font-medium whitespace-nowrap">
+                                        ⏳ {scheme.deadline === 'Open' ? (language === 'hi' ? 'खुला है' : 'Open') : scheme.deadline}
+                                    </div>
+                                )}
+                            <div className="flex items-center gap-1 text-xs text-blue-300 bg-blue-500/10 px-2 py-1 rounded-md border border-blue-500/20 print:text-blue-600 print:border-blue-600">
+                                <span className="font-bold">{scheme.usefulnessScore}%</span> {t.match}
+                            </div>
                         </div>
                         <button
                             onClick={handleShare}
@@ -106,6 +114,32 @@ const SchemeCard = ({ scheme, index, t, language }) => {
                         <MessageSquare className="w-4 h-4" />
                         {t.askAI}
                     </button>
+
+                    {/* Apply Button Logic with Fallback */}
+                    {(() => {
+                        const hasUrl = scheme.application_url && scheme.application_url !== 'N/A';
+                        const linkUrl = hasUrl
+                            ? scheme.application_url
+                            : `https://www.google.com/search?q=${encodeURIComponent(scheme.name + ' official website apply online')}`;
+
+                        return (
+                            <a
+                                href={linkUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className={`text-sm font-semibold flex items-center gap-1 transition-colors px-3 py-1.5 rounded-lg shadow-sm ${hasUrl
+                                        ? 'bg-green-600 hover:bg-green-500 text-white shadow-green-500/20'
+                                        : 'bg-slate-700 hover:bg-slate-600 text-gray-200 border border-white/10'
+                                    }`}
+                            >
+                                <ExternalLink className="w-4 h-4" />
+                                {hasUrl
+                                    ? (language === 'hi' ? 'अभी आवेदन करें' : 'Apply Now')
+                                    : (language === 'hi' ? 'खोजें और आवेदन करें' : 'Search to Apply')
+                                }
+                            </a>
+                        );
+                    })()}
                 </div>
             </div>
 
