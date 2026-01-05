@@ -7,6 +7,7 @@ import Disclaimer from '../components/Disclaimer';
 import HowItWorks from '../components/HowItWorks';
 import { recommendSchemes } from '../api';
 import { translations } from '../translations';
+import SchemeAnalytics from '../components/SchemeAnalytics';
 
 function HomePage() {
     const [schemes, setSchemes] = useState([]);
@@ -111,6 +112,7 @@ function HomePage() {
 
                     {showResults && (
                         <div id="results" className="scroll-mt-24 space-y-12">
+                            <SchemeAnalytics schemes={schemes} language={language} />
                             <ResultsSection schemes={schemes} generalAdvice={generalAdvice} language={language} t={t} />
 
                             <div className="bg-white/5 border border-white/10 rounded-2xl p-6 md:p-8 text-center">
