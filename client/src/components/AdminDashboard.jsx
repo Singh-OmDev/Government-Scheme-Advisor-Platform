@@ -163,37 +163,51 @@ const AdminDashboard = ({ language }) => {
                         </div>
                     </div>
 
-                    {/* RIGHT COLUMN: RECENT ACTIVITY LOG */}
+                    {/* RIGHT COLUMN: RECENT ACTIVITY LOG (IMPACT STORIES) */}
                     <div className="lg:col-span-1">
                         <div className="bg-slate-900/80 border border-white/10 rounded-2xl p-6 h-full sticky top-24">
                             <h4 className="text-lg font-semibold text-white mb-6 flex items-center gap-2">
                                 <Clock className="w-5 h-5 text-orange-400" />
-                                Recent Activity
+                                {isHindi ? 'हालिया गतिविधियाँ' : 'Impact Stories'}
                             </h4>
 
                             <div className="space-y-6 relative">
                                 {/* Vertical Line */}
                                 <div className="absolute left-4 top-2 bottom-2 w-0.5 bg-white/10"></div>
 
-                                {recentActivity.map((item, index) => (
-                                    <div key={index} className="relative pl-10">
-                                        {/* Dot */}
-                                        <div className="absolute left-[13px] top-1.5 w-2 h-2 rounded-full bg-blue-500 ring-4 ring-slate-900"></div>
+                                {data.recentSearches && data.recentSearches.length > 0 ? (
+                                    data.recentSearches.map((item, index) => (
+                                        <div key={index} className="relative pl-10">
+                                            {/* Dot */}
+                                            <div className="absolute left-[13px] top-1.5 w-2 h-2 rounded-full bg-blue-500 ring-4 ring-slate-900"></div>
 
-                                        <div className="flex flex-col">
-                                            <span className="text-xs text-gray-500 font-medium mb-1">{item.time}</span>
-                                            <p className="text-gray-300 text-sm leading-relaxed">
-                                                {item.text}
-                                            </p>
+                                            <div className="flex flex-col">
+                                                <span className="text-xs text-gray-500 font-medium mb-1">
+                                                    {item.timestamp ? new Date(item.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Recently'}
+                                                </span>
+                                                <p className="text-gray-300 text-sm leading-relaxed">
+                                                    <span className="text-blue-400 font-medium">{item.profile?.occupation || 'User'}</span> from <span className="text-purple-400">{item.profile?.state || 'India'}</span> found <span className="text-green-400 font-bold">{item.schemesFound} schemes</span>
+                                                    {item.topSchemes && item.topSchemes.length > 0 && (
+                                                        <span className="text-gray-500 text-xs block mt-1">
+                                                            including {item.topSchemes[0]}
+                                                        </span>
+                                                    )}
+                                                </p>
+                                            </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    ))
+                                ) : (
+                                    <div className="text-gray-500 text-sm pl-10 italic">No recent activity.</div>
+                                )}
                             </div>
 
                             <div className="mt-8 pt-6 border-t border-white/10">
-                                <button className="w-full py-2 bg-white/5 hover:bg-white/10 rounded-lg text-sm text-gray-400 transition-colors">
-                                    View Full Logs
-                                </button>
+                                <div className="p-4 bg-gradient-to-r from-blue-900/20 to-purple-900/20 rounded-lg border border-white/5">
+                                    <p className="text-xs text-gray-400 uppercase tracking-widest mb-1">Total Impact</p>
+                                    <p className="text-sm text-gray-300">
+                                        Helping citizens find their eligible benefits in real-time.
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </div>

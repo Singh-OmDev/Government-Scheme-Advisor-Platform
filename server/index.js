@@ -83,10 +83,16 @@ app.get('/api/analytics', async (req, res) => {
             { $limit: 5 }
         ]);
 
+        const recentSearches = await Analytics.find()
+            .sort({ timestamp: -1 })
+            .limit(5)
+            .select('profile.state profile.occupation schemesFound topSchemes timestamp');
+
         res.json({
             totalSearches,
             topStates: stateStats,
-            topOccupations: occupationStats
+            topOccupations: occupationStats,
+            recentSearches
         });
     } catch (error) {
         console.error("Analytics fetch error:", error);
