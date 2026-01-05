@@ -8,7 +8,7 @@ import HowItWorks from '../components/HowItWorks';
 import { recommendSchemes } from '../api';
 import { translations } from '../translations';
 import SchemeAnalytics from '../components/SchemeAnalytics';
-import AdminDashboard from '../components/AdminDashboard';
+import TrustSection from '../components/TrustSection';
 
 function HomePage() {
     const [schemes, setSchemes] = useState([]);
@@ -100,6 +100,9 @@ function HomePage() {
                     </div>
 
                     <HowItWorks language={language} t={t} />
+
+                    {/* New Trust & Privacy Section */}
+                    <TrustSection language={language} t={t} />
 
                     <div className="relative z-20">
                         <InputForm onSubmit={handleFormSubmit} isLoading={isLoading} language={language} t={t} />
