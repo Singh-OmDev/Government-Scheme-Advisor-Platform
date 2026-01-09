@@ -10,7 +10,10 @@ import { translations } from '../translations';
 import SchemeAnalytics from '../components/SchemeAnalytics';
 import TrustSection from '../components/TrustSection';
 
+import { useUser } from '@clerk/clerk-react';
+
 function HomePage() {
+    const { user } = useUser();
     const [schemes, setSchemes] = useState([]);
     const [generalAdvice, setGeneralAdvice] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -35,7 +38,11 @@ function HomePage() {
         setShowResults(false);
         setUserProfile(formData);
         try {
-            const data = await recommendSchemes({ ...formData, language });
+            const data = await recommendSchemes({
+                ...formData,
+                language,
+                userId: user?.id
+            });
             if (data.schemes) {
                 setSchemes(data.schemes);
                 setGeneralAdvice(data.generalAdvice || []);

@@ -9,6 +9,7 @@ const { recommendSchemes, chatWithScheme } = require('./groq');
 
 const mongoose = require('mongoose');
 const Analytics = require('./models/Analytics');
+const History = require('./models/History');
 
 const app = express();
 const port = process.env.PORT || 5000;
@@ -32,9 +33,10 @@ app.post('/api/recommend-schemes', async (req, res) => {
         const recommendations = await recommendSchemes(userProfile, language);
         console.log("Recommendations generated successfully");
 
+        const schemeNames = recommendations.schemes ? recommendations.schemes.map(s => s.name) : [];
+
         // --- Save Analytics Background Task (Fire & Forget) ---
         try {
-            const schemeNames = recommendations.schemes ? recommendations.schemes.map(s => s.name) : [];
             await Analytics.create({
                 profile: {
                     state: userProfile.state,
@@ -50,6 +52,27 @@ app.post('/api/recommend-schemes', async (req, res) => {
             console.log("📊 Analytics saved.");
         } catch (analyticsErr) {
             console.error("⚠️ Analytics save failed:", analyticsErr.message);
+        }
+
+        // --- Save User History (if userId provided) ---
+        if (userProfile.userId) {
+            try {
+                await History.create({
+                    userId: userProfile.userId,
+                    profile: {
+                        state: userProfile.state,
+                        age: userProfile.age,
+                        occupation: userProfile.occupation,
+                        income: userProfile.annualIncome,
+                        category: userProfile.category
+                    },
+                    schemesFound: schemeNames.length,
+                    topSchemes: schemeNames.slice(0, 5)
+                });
+                console.log(`📜 History saved for user ${userProfile.userId}`);
+            } catch (histErr) {
+                console.error("⚠️ History save failed:", histErr.message);
+            }
         }
         // -------------------------------------------------------
 
@@ -97,6 +120,18 @@ app.get('/api/analytics', async (req, res) => {
     } catch (error) {
         console.error("Analytics fetch error:", error);
         res.status(500).json({ error: "Failed to fetch analytics" });
+    }
+});
+
+// Get User History
+app.get('/api/history/:userId', async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const history = await History.find({ userId }).sort({ timestamp: -1 }).limit(20);
+        res.json(history);
+    } catch (error) {
+        console.error("History fetch error:", error);
+        res.status(500).json({ error: "Failed to fetch history" });
     }
 });
 
