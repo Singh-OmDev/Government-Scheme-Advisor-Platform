@@ -1,5 +1,16 @@
-let apiUrl = import.meta.env.VITE_API_URL || '/api';
-// Defensive check: If local environment still points to 5001, force proxy usage
+let apiUrl = import.meta.env.VITE_API_URL;
+
+if (!apiUrl) {
+    if (import.meta.env.MODE === 'production') {
+        // Direct connection to Render in production to avoid Vercel proxy issues
+        apiUrl = 'https://ai-government-scheme-advisor.onrender.com/api';
+    } else {
+        // Use local proxy in development
+        apiUrl = '/api';
+    }
+}
+
+// Defensive check for local legacy port
 if (apiUrl.includes('localhost:5001')) {
     apiUrl = '/api';
 }
