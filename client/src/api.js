@@ -1,4 +1,4 @@
-export const API_URL = import.meta.env.VITE_API_URL || '/api';
+export const API_URL = '/api';
 // export const API_URL = 'https://ai-government-scheme-advisor.onrender.com/api';
 
 export const recommendSchemes = async (userProfile, token) => {
