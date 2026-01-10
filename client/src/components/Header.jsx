@@ -1,16 +1,19 @@
 
 import React from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { Languages, ShieldCheck, BarChart2, HelpCircle, BookmarkCheck } from 'lucide-react';
 
 import { SignedIn, SignedOut, UserButton } from "@clerk/clerk-react";
 
 const Header = ({ language, setLanguage, t }) => {
     const navigate = useNavigate();
+    const location = useLocation();
+
+    const isActive = (path) => location.pathname === path;
 
     return (
         <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-slate-950/80 backdrop-blur-xl border-b border-white/5">
-            <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+            <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between relative">
 
                 {/* Logo Section */}
                 <Link to="/" className="flex items-center gap-3 group">
@@ -22,44 +25,55 @@ const Header = ({ language, setLanguage, t }) => {
                     </span>
                 </Link>
 
-                {/* Right Actions Group */}
-                <div className="flex items-center gap-5">
+                {/* Centered Navigation Pills */}
+                <nav className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden md:flex items-center p-1.5 bg-white/5 border border-white/10 rounded-full backdrop-blur-md shadow-xl shadow-black/20">
+                    <Link
+                        to="/dashboard"
+                        className={`flex items-center gap-2 px-5 py-2 text-sm font-medium rounded-full transition-all duration-300 ${isActive('/dashboard')
+                                ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/25'
+                                : 'text-slate-400 hover:text-white hover:bg-white/5'
+                            }`}
+                    >
+                        <BarChart2 className={`w-4 h-4 ${isActive('/dashboard') ? 'animate-pulse' : ''}`} />
+                        Insights
+                    </Link>
 
-                    {/* Navigation Pills (Only visible when needed) */}
-                    <nav className="hidden md:flex items-center p-1 bg-white/5 border border-white/10 rounded-full">
-                        <Link to="/dashboard" className="flex items-center gap-2 px-4 py-1.5 text-sm font-medium text-slate-300 hover:text-white hover:bg-white/10 rounded-full transition-all">
-                            <BarChart2 className="w-4 h-4" />
-                            Insights
+                    <SignedIn>
+                        <Link
+                            to="/saved-schemes"
+                            className={`flex items-center gap-2 px-5 py-2 text-sm font-medium rounded-full transition-all duration-300 ${isActive('/saved-schemes')
+                                    ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/25'
+                                    : 'text-slate-400 hover:text-white hover:bg-white/5'
+                                }`}
+                        >
+                            <BookmarkCheck className="w-4 h-4" />
+                            Saved
                         </Link>
+                    </SignedIn>
+                </nav>
 
-                        <SignedIn>
-                            <Link to="/saved-schemes" className="flex items-center gap-2 px-4 py-1.5 text-sm font-medium text-slate-300 hover:text-emerald-300 hover:bg-emerald-500/10 rounded-full transition-all">
-                                <BookmarkCheck className="w-4 h-4" />
-                                Saved
-                            </Link>
-                        </SignedIn>
-                    </nav>
-
-                    {/* Divider */}
-                    <div className="h-6 w-px bg-white/10 hidden md:block" />
+                {/* Right Actions Group */}
+                <div className="flex items-center gap-4">
 
                     {/* Utility Tools */}
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 bg-white/5 p-1 rounded-full border border-white/5">
                         <button
                             onClick={() => setLanguage(language === 'en' ? 'hi' : 'en')}
-                            className="p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-full transition-colors border border-transparent hover:border-white/10"
+                            className="p-2 text-slate-400 hover:text-white hover:bg-white/10 rounded-full transition-colors"
                             title="Change Language"
                         >
-                            <Languages className="w-5 h-5" />
+                            <Languages className="w-4 h-4" />
                         </button>
 
-                        <Link to="/help" className="p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-full transition-colors border border-transparent hover:border-white/10" title="Help">
-                            <HelpCircle className="w-5 h-5" />
+                        <div className="w-px h-4 bg-white/10" />
+
+                        <Link to="/help" className="p-2 text-slate-400 hover:text-white hover:bg-white/10 rounded-full transition-colors" title="Help">
+                            <HelpCircle className="w-4 h-4" />
                         </Link>
                     </div>
 
                     {/* Auth Section */}
-                    <div className="pl-2">
+                    <div className="pl-2 border-l border-white/10">
                         <SignedOut>
                             <Link
                                 to="/sign-in"
