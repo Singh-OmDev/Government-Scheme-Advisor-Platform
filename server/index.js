@@ -36,9 +36,19 @@ process.on('unhandledRejection', (err) => {
 });
 
 // Connect to MongoDB
-// mongoose.connect(process.env.MONGODB_URI)
-//     .then(() => console.log('✅ MongoDB Connected'))
-//     .catch(err => console.error('❌ MongoDB Connection Error:', err));
+// Connect to MongoDB with robust error handling
+mongoose.connect(process.env.MONGODB_URI, {
+    serverSelectionTimeoutMS: 5000, // Fail after 5s if no DB
+})
+    .then(() => console.log('✅ MongoDB Connected'))
+    .catch(err => {
+        console.error('❌ MongoDB Connection Initial Fail:', err.message);
+        // Do NOT process.exit(1) here, let the server run without DB
+    });
+
+mongoose.connection.on('error', err => {
+    console.error('❌ MongoDB Runtime Error:', err.message);
+});
 
 const { clerkMiddleware, requireAuth } = require('@clerk/express');
 

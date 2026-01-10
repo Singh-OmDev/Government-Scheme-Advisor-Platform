@@ -5,42 +5,47 @@ import { ChevronDown, ExternalLink, FileText, CheckCircle, MessageSquare, Send, 
 import { chatWithScheme, saveScheme, removeSavedScheme } from '../api';
 import { useUser } from '@clerk/clerk-react';
 
-const SchemeCard = ({ scheme, index, t, language }) => {
+const SchemeCard = ({ scheme, index, t, language, initialSavedState = false, onRemove }) => {
     const { user } = useUser();
     const [isExpanded, setIsExpanded] = useState(false);
     const [showChat, setShowChat] = useState(false);
     const [chatInput, setChatInput] = useState('');
     const [chatHistory, setChatHistory] = useState([]);
     const [isChatLoading, setIsChatLoading] = useState(false);
-    const [isSaved, setIsSaved] = useState(false);
+    const [isSaved, setIsSaved] = useState(initialSavedState);
     const [isSaveLoading, setIsSaveLoading] = useState(false);
-
-    // Initial check (you might want to pass this prop from parent for efficiency, but simple state here works for instant feedback)
-    // Actually, for instant "Search" results, we don't know if they are saved unless we fetched user saved schemes beforehand.
-    // For now, let's keep it simple: defaulting to false, and user can save. 
-    // Ideally, parent passes 'savedSchemeIds' array.
 
     const handleSaveToggle = async () => {
         if (!user) {
             alert("Please sign in to save schemes!");
             return;
         }
-        setIsSaveLoading(true);
+
+        if (isSaved && onRemove) {
+            // If onRemove is provided (e.g., SavedPage), delegated logic
+            onRemove();
+            return;
+        }
+        if (!user) {
+            alert("Please sign in to save schemes!");
+            return;
+        }
+
+        // Optimistic Update: Update UI immediately
+        const wasSaved = isSaved;
+        setIsSaved(true);
+        // setIsSaveLoading(true); // Don't show loading state, just show success
+
         try {
-            if (isSaved) {
-                // We actually need the _id of the saved document to delete it, currently we only have scheme info.
-                // For this implementation, we'll only support Saving for now in this unified card.
-                // A true toggle requires fetching the saved ID first.
-                // Let's implement "Save" only for search results.
-                await saveScheme(user.id, scheme);
-                setIsSaved(true);
-            } else {
-                await saveScheme(user.id, scheme);
-                setIsSaved(true);
-            }
+            // Perform API call in background
+            await saveScheme(user.id, scheme);
         } catch (error) {
-            if (error.message === "Already saved") setIsSaved(true);
-            else console.error("Save failed", error);
+            if (error.message !== "Already saved") {
+                console.error("Save failed", error);
+                // Revert on failure
+                setIsSaved(wasSaved);
+                alert("Failed to save. Please try again.");
+            }
         } finally {
             setIsSaveLoading(false);
         }
@@ -113,14 +118,22 @@ const SchemeCard = ({ scheme, index, t, language }) => {
                         >
                             <Share2 className="w-5 h-5" />
                         </button>
-                        <button
+                        <motion.button
+                            whileTap={{ scale: 0.85 }}
                             onClick={handleSaveToggle}
                             disabled={isSaveLoading || isSaved}
-                            className={`transition-colors print:hidden ${isSaved ? 'text-green-500' : 'text-gray-400 hover:text-blue-400'}`}
+                            className={`transition-colors print:hidden relative ${isSaved ? 'text-green-500' : 'text-gray-400 hover:text-blue-400'}`}
                             title={isSaved ? "Saved" : "Save Scheme"}
                         >
-                            {isSaved ? <BookmarkCheck className="w-5 h-5" /> : <Bookmark className="w-5 h-5" />}
-                        </button>
+                            <motion.div
+                                key={isSaved ? "saved" : "unsaved"}
+                                initial={{ scale: 0.5, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                            >
+                                {isSaved ? <BookmarkCheck className="w-6 h-6 fill-current" /> : <Bookmark className="w-6 h-6" />}
+                            </motion.div>
+                        </motion.button>
                     </div>
                 </div>
 

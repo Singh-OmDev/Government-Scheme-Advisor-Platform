@@ -15,13 +15,27 @@ import { useUser, useAuth } from '@clerk/clerk-react';
 function HomePage() {
     const { user } = useUser();
     const { getToken } = useAuth();
-    const [schemes, setSchemes] = useState([]);
-    const [generalAdvice, setGeneralAdvice] = useState([]);
+
+    // Initialize state from sessionStorage if available
+    const [schemes, setSchemes] = useState(() => {
+        const saved = sessionStorage.getItem('hs_schemes');
+        return saved ? JSON.parse(saved) : [];
+    });
+    const [generalAdvice, setGeneralAdvice] = useState(() => {
+        const saved = sessionStorage.getItem('hs_advice');
+        return saved ? JSON.parse(saved) : [];
+    });
+    const [userProfile, setUserProfile] = useState(() => {
+        const saved = sessionStorage.getItem('hs_profile');
+        return saved ? JSON.parse(saved) : null;
+    });
+    const [showResults, setShowResults] = useState(() => {
+        return sessionStorage.getItem('hs_show') === 'true';
+    });
+
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [showResults, setShowResults] = useState(false);
     const [language, setLanguage] = useState('en');
-    const [userProfile, setUserProfile] = useState(null);
 
     const t = translations[language];
 
@@ -49,6 +63,12 @@ function HomePage() {
                 setSchemes(data.schemes);
                 setGeneralAdvice(data.generalAdvice || []);
                 setShowResults(true);
+
+                // Persist to Session Storage
+                sessionStorage.setItem('hs_schemes', JSON.stringify(data.schemes));
+                sessionStorage.setItem('hs_advice', JSON.stringify(data.generalAdvice || []));
+                sessionStorage.setItem('hs_profile', JSON.stringify(formData));
+                sessionStorage.setItem('hs_show', 'true');
             } else {
                 setError("No schemes found. Please try again.");
             }

@@ -95,13 +95,9 @@ const SavedSchemesPage = () => {
                                         index={index}
                                         t={t}
                                         language={language}
+                                        initialSavedState={true}
+                                        onRemove={() => handleRemove(item._id)}
                                     />
-                                    <button
-                                        onClick={() => handleRemove(item._id)}
-                                        className="absolute top-4 right-4 z-10 bg-red-500/10 text-red-400 p-2 rounded-lg hover:bg-red-500/20 opacity-0 group-hover:opacity-100 transition-opacity text-xs font-medium border border-red-500/20"
-                                    >
-                                        Remove
-                                    </button>
                                 </div>
                             );
                         })}
