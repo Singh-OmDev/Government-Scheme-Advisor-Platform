@@ -42,6 +42,7 @@ app.get('/api/debug-config', (req, res) => {
         clerkSecretKeySet: !!process.env.CLERK_SECRET_KEY,
         clerkPublishableKeySet: !!process.env.CLERK_PUBLISHABLE_KEY,
         mongoUriSet: !!process.env.MONGODB_URI,
+        groqApiKeySet: !!process.env.GROQ_API_KEY,
         port: process.env.PORT,
         nodeEnv: process.env.NODE_ENV
     });
