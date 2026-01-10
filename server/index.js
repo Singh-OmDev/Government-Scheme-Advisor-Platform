@@ -18,8 +18,8 @@ const History = require('./models/History');
 const SavedScheme = require('./models/SavedScheme');
 
 const app = express();
-const port = 5002; // Hardcoded to match Vite Proxy
-// const port = process.env.PORT || 5002;
+// const port = 5002; // Hardcoded to match Vite Proxy
+const port = process.env.PORT || 5002;
 // const port = process.env.PORT || 5000;
 
 // Connect to MongoDB
