@@ -1,5 +1,9 @@
-export const API_URL = import.meta.env.VITE_API_URL || '/api';
-// export const API_URL = 'http://localhost:5002/api';
+let apiUrl = import.meta.env.VITE_API_URL || '/api';
+// Defensive check: If local environment still points to 5001, force proxy usage
+if (apiUrl.includes('localhost:5001')) {
+    apiUrl = '/api';
+}
+export const API_URL = apiUrl;
 
 export const recommendSchemes = async (userProfile, token) => {
     try {
