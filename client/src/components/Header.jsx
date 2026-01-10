@@ -9,53 +9,78 @@ const Header = ({ language, setLanguage, t }) => {
     const navigate = useNavigate();
 
     return (
-        <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-slate-900/80 backdrop-blur-md border-b border-white/10">
+        <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300 bg-slate-950/80 backdrop-blur-xl border-b border-white/5">
             <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-                <Link to="/" className="flex items-center gap-2 group">
-                    <div className="bg-blue-600/20 p-2 rounded-lg group-hover:bg-blue-600/30 transition-colors">
-                        <ShieldCheck className="w-6 h-6 text-blue-400" />
+
+                {/* Logo Section */}
+                <Link to="/" className="flex items-center gap-3 group">
+                    <div className="bg-gradient-to-tr from-blue-600 to-cyan-500 p-2 rounded-xl shadow-lg shadow-blue-500/20 group-hover:scale-105 transition-transform duration-300">
+                        <ShieldCheck className="w-5 h-5 text-white" />
                     </div>
-                    <span className="font-bold text-xl tracking-tight">Scheme<span className="text-blue-400">Advisor</span></span>
+                    <span className="font-bold text-xl tracking-tight text-white">
+                        Scheme<span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">Advisor</span>
+                    </span>
                 </Link>
 
-                <nav className="flex items-center gap-6">
-                    <Link to="/dashboard" className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-blue-400 rounded-full border border-blue-500/20 transition-all hover:shadow-[0_0_15px_rgba(59,130,246,0.3)] group">
-                        <BarChart2 className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                        <span className="font-medium text-sm">Insights</span>
-                    </Link>
+                {/* Right Actions Group */}
+                <div className="flex items-center gap-5">
 
-                    <SignedIn>
-                        <Link to="/saved-schemes" className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-green-400 rounded-full border border-green-500/20 transition-all hover:shadow-[0_0_15px_rgba(16,185,129,0.3)] group">
-                            <BookmarkCheck className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                            <span className="font-medium text-sm">Saved</span>
+                    {/* Navigation Pills (Only visible when needed) */}
+                    <nav className="hidden md:flex items-center p-1 bg-white/5 border border-white/10 rounded-full">
+                        <Link to="/dashboard" className="flex items-center gap-2 px-4 py-1.5 text-sm font-medium text-slate-300 hover:text-white hover:bg-white/10 rounded-full transition-all">
+                            <BarChart2 className="w-4 h-4" />
+                            Insights
                         </Link>
-                    </SignedIn>
 
-                    <button
-                        onClick={() => setLanguage(language === 'en' ? 'hi' : 'en')}
-                        className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 transition-colors text-sm font-medium text-gray-300"
-                    >
-                        <Languages className="w-4 h-4" />
-                        {language === 'en' ? 'हिंदी' : 'English'}
-                    </button>
+                        <SignedIn>
+                            <Link to="/saved-schemes" className="flex items-center gap-2 px-4 py-1.5 text-sm font-medium text-slate-300 hover:text-emerald-300 hover:bg-emerald-500/10 rounded-full transition-all">
+                                <BookmarkCheck className="w-4 h-4" />
+                                Saved
+                            </Link>
+                        </SignedIn>
+                    </nav>
 
-                    <Link to="/help" className="flex items-center gap-2 text-gray-300 hover:text-white transition-colors">
-                        <HelpCircle className="w-4 h-4" />
-                        <span className="hidden md:inline">{language === 'hi' ? 'सहायता' : 'Help'}</span>
-                    </Link>
+                    {/* Divider */}
+                    <div className="h-6 w-px bg-white/10 hidden md:block" />
 
-                    <SignedOut>
-                        <Link
-                            to="/sign-in"
-                            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors shadow-lg shadow-blue-500/20"
+                    {/* Utility Tools */}
+                    <div className="flex items-center gap-3">
+                        <button
+                            onClick={() => setLanguage(language === 'en' ? 'hi' : 'en')}
+                            className="p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-full transition-colors border border-transparent hover:border-white/10"
+                            title="Change Language"
                         >
-                            {language === 'hi' ? 'साइन इन' : 'Sign In'}
+                            <Languages className="w-5 h-5" />
+                        </button>
+
+                        <Link to="/help" className="p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-full transition-colors border border-transparent hover:border-white/10" title="Help">
+                            <HelpCircle className="w-5 h-5" />
                         </Link>
-                    </SignedOut>
-                    <SignedIn>
-                        <UserButton afterSignOutUrl="/" />
-                    </SignedIn>
-                </nav>
+                    </div>
+
+                    {/* Auth Section */}
+                    <div className="pl-2">
+                        <SignedOut>
+                            <Link
+                                to="/sign-in"
+                                className="px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold rounded-full transition-all shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40"
+                            >
+                                {language === 'hi' ? 'साइन इन' : 'Sign In'}
+                            </Link>
+                        </SignedOut>
+                        <SignedIn>
+                            <UserButton
+                                afterSignOutUrl="/"
+                                appearance={{
+                                    elements: {
+                                        avatarBox: "w-9 h-9 border-2 border-white/10 hover:border-blue-500/50 transition-colors"
+                                    }
+                                }}
+                            />
+                        </SignedIn>
+                    </div>
+
+                </div>
             </div>
         </header>
     );
