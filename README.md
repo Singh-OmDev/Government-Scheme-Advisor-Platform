@@ -1,4 +1,4 @@
-# AI Government Scheme Advisor – India
+# Government Scheme Advisor – India
 
 [![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen)](https://ai-government-scheme-advisor.vercel.app/)
 [![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](https://opensource.org/licenses/ISC)
