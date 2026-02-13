@@ -179,21 +179,28 @@ const SchemeCard = ({ scheme, index, t, language, initialSavedState = false, onR
                             : `https://www.google.com/search?q=${encodeURIComponent(scheme.name + ' official website apply online')}`;
 
                         return (
-                            <a
-                                href={linkUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className={`text-sm font-semibold flex items-center gap-1 transition-colors px-3 py-1.5 rounded-lg shadow-sm ${hasUrl
-                                    ? 'bg-green-600 hover:bg-green-500 text-white shadow-green-500/20'
-                                    : 'bg-slate-700 hover:bg-slate-600 text-gray-200 border border-white/10'
-                                    }`}
-                            >
-                                <ExternalLink className="w-4 h-4" />
-                                {hasUrl
-                                    ? (language === 'hi' ? 'अभी आवेदन करें' : 'Apply Now')
-                                    : (language === 'hi' ? 'खोजें और आवेदन करें' : 'Search to Apply')
-                                }
-                            </a>
+                            <div className="flex flex-col items-end gap-1">
+                                <a
+                                    href={linkUrl}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className={`text-sm font-semibold flex items-center gap-1 transition-colors px-3 py-1.5 rounded-lg shadow-sm ${hasUrl
+                                        ? 'bg-green-600 hover:bg-green-500 text-white shadow-green-500/20'
+                                        : 'bg-slate-700 hover:bg-slate-600 text-gray-200 border border-white/10'
+                                        }`}
+                                >
+                                    <ExternalLink className="w-4 h-4" />
+                                    {hasUrl
+                                        ? (language === 'hi' ? 'अभी आवेदन करें' : 'Apply Now')
+                                        : (language === 'hi' ? 'खोजें और आवेदन करें' : 'Search to Apply')
+                                    }
+                                </a>
+                                {hasUrl && (
+                                    <span className="text-[10px] text-gray-400 flex items-center gap-1">
+                                        Source: {new URL(scheme.application_url).hostname.replace('www.', '')}
+                                    </span>
+                                )}
+                            </div>
                         );
                     })()}
                 </div>
