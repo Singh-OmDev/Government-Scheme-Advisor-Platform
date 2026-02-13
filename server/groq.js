@@ -60,14 +60,19 @@ async function recommendSchemes(userProfile, language = 'en') {
     step1Data = JSON.parse(jsonString);
   } catch (err) {
     console.error("Step 1 (Names) Failed:", err);
-    throw new Error("Failed to identify schemes.");
+    console.warn("⚠️ Groq API Failed (Rate Limit/Error). Using Fallback Schemes.");
+    return {
+      schemes: require('./constants/fallbackSchemes').FALLBACK_SCHEMES,
+      generalAdvice: ["We are experiencing high traffic. Here are some popular schemes for everyone."]
+    };
   }
 
   const allNames = step1Data.schemeNames || [];
   const generalAdvice = step1Data.generalAdvice || [];
 
   if (allNames.length === 0) {
-    return { schemes: [], generalAdvice };
+    console.warn("⚠️ No schemes found by AI. Using Fallback Schemes.");
+    return { schemes: require('./constants/fallbackSchemes').FALLBACK_SCHEMES, generalAdvice: ["Could not find specific schemes for your profile at this moment.", "Please check the 'General' schemes listed below."] };
   }
 
   // Step 2: Parallel Details Fetching

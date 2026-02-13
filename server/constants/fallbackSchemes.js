@@ -1,0 +1,72 @@
+module.exports.FALLBACK_SCHEMES = [
+    {
+        name: "Pradhan Mantri Jan Dhan Yojana (PMJDY)",
+        type: "Central",
+        state: "All India",
+        categoryTags: ["Financial Inclusion", "Banking"],
+        description: "A National Mission for Financial Inclusion to ensure access to financial services, namely, a basic savings & deposit accounts, remittance, credit, insurance, pension in an affordable manner.",
+        eligibilitySummary: ["Any citizen of India", "Minors above 10 years age"],
+        requiredDocuments: ["Aadhaar Card", "PAN Card (if available)", "Passport size photo"],
+        applicationSteps: ["Visit nearest bank", "Fill PMJDY Application Form", "Submit documents"],
+        benefits: ["Zero balance account", "Rupay Debit Card", "Overdraft facility up to ₹10,000"],
+        application_url: "https://pmjdy.gov.in/",
+        deadline: "Open",
+        usefulnessScore: 95
+    },
+    {
+        name: "Ayushman Bharat - Pradhan Mantri Jan Arogya Yojana (PM-JAY)",
+        type: "Central",
+        state: "All India",
+        categoryTags: ["Health", "Insurance"],
+        description: "World's largest government funded health assurance scheme offering cover of Rs. 5 lakhs per family per year for secondary and tertiary care hospitalization.",
+        eligibilitySummary: ["Families listed in SECC 2011 database", "Occupational criteria for urban areas"],
+        requiredDocuments: ["Aadhaar Card", "Ration Card", "Mobile Number"],
+        applicationSteps: ["Check eligibility on PMJAY portal", "Visit Empanelled Hospital", "Verify Identity"],
+        benefits: ["₹5 Lakh health cover", "Cashless treatment", "Covers pre-existing diseases"],
+        application_url: "https://pmjay.gov.in/",
+        deadline: "Open",
+        usefulnessScore: 90
+    },
+    {
+        name: "Pradhan Mantri Suraksha Bima Yojana (PMSBY)",
+        type: "Central",
+        state: "All India",
+        categoryTags: ["Insurance", "Accidental Cover"],
+        description: "Accidental insurance scheme offering accidental death and disability cover for death or disability on account of an accident.",
+        eligibilitySummary: ["Age 18-70 years", "Bank account holder"],
+        requiredDocuments: ["Aadhaar Card", "Bank Account Details"],
+        applicationSteps: ["Contact your Bank", "Fill PMSBY Form", "Auto-debit authorization"],
+        benefits: ["₹2 Lakh for accidental death", "₹1 Lakh for partial disability", "Premium ₹20/year"],
+        application_url: "https://www.jansuraksha.gov.in/",
+        deadline: "May 31 (Annual Renewal)",
+        usefulnessScore: 85
+    },
+    {
+        name: "Make in India",
+        type: "Central",
+        state: "All India",
+        categoryTags: ["Business", "Entrepreneurship"],
+        description: "A major national programme designed to facilitate investment, foster innovation, enhance skill development, protect intellectual property and build best in class manufacturing infrastructure.",
+        eligibilitySummary: ["Entrepreneurs", "Investors", "Manufacturers"],
+        requiredDocuments: ["Business Registration", "Project Report", "Tax Documents"],
+        applicationSteps: ["Visit Make in India portal", "Register Business", "Apply for Sectoral Benefits"],
+        benefits: ["Tax exemptions", "Investment support", "Ease of doing business"],
+        application_url: "https://www.makeinindia.com/",
+        deadline: "Open",
+        usefulnessScore: 80
+    },
+    {
+        name: "Digital India",
+        type: "Central",
+        state: "All India",
+        categoryTags: ["Technology", "Digital Literacy"],
+        description: "A flagship programme of the Govt of India with a vision to transform India into a digitally empowered society and knowledge economy.",
+        eligibilitySummary: ["All Citizens", "Students", "Businesses"],
+        requiredDocuments: ["Aadhaar Card", "Educational Certificates"],
+        applicationSteps: ["Visit Digital India Portal", "Register for services", "Download UMANG App"],
+        benefits: ["Digital Literacy", "Online Govt Services", "High-speed internet access"],
+        application_url: "https://digitalindia.gov.in/",
+        deadline: "Open",
+        usefulnessScore: 85
+    }
+];
