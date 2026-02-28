@@ -3,7 +3,7 @@
 [![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen)](https://ai-government-scheme-advisor.vercel.app/)
 [![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](https://opensource.org/licenses/ISC)
 
-<img width="1899" height="867" alt="Dashboard Screenshot" src="https://github.com/user-attachments/assets/8eb51b1d-76c9-409b-a9ba-4a0425b6e170" />
+<img width="640" height="640" alt="scheme_advisor_banner_1772287803689" src="https://github.com/user-attachments/assets/3def8f6e-b0fe-4048-a35b-4c8c0af36722" />
 
 ## 📋 Overview
 
