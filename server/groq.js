@@ -145,7 +145,10 @@ async function recommendSchemes(userProfile, language = 'en') {
          - CRITICAL: Review the State. If the scheme is a State Scheme for a state OTHER THAN '${userProfile.state}', you MUST reject it.
          - CRITICAL: Review Category. If the scheme is ONLY for SC/ST and user is '${userProfile.category}', verify match. 
          If a scheme is clearly ineligible, do NOT return it in the array; omit it entirely.
-      4. PROVIDE OFFICIAL SOURCES: application_url MUST be a real, verifiable link (ending in .gov.in, .nic.in, etc.) if online application is possible.
+      4. PROVIDE OFFICIAL SOURCES (CRITICAL):
+         - \`application_url\` MUST be a verifiable official government link (MUST END with \`.gov.in\`, \`.nic.in\` or \`.org.in\`).
+         - DO NOT Hallucinate URLs. DO NOT provide dead links like "pmkvyofficial.org".
+         - If you are not 100% certain of the official URL, YOU MUST output a Google Search link instead: \`https://www.google.com/search?q=\` + URL Encoded Scheme Name.
       5. ${isHindi ? 'Translate content to Hindi.' : 'Keep content in English.'}
       6. Ensure "name" matches the input name exactly.
     `;
@@ -224,6 +227,25 @@ async function recommendSchemes(userProfile, language = 'en') {
       if (scstKeywords.some(keyword => schemeText.includes(keyword)) && 
           !schemeText.includes('general') && !schemeText.includes('all categories')) {
         return false; // Drop SC/ST/OBC exclusive schemes for General
+      }
+    }
+
+    // 4. URL SANITIZATION (Prevent Hallucinations/Dead links)
+    if (scheme.application_url && scheme.application_url !== 'N/A') {
+      const urlLower = scheme.application_url.toLowerCase();
+      const validTlds = ['.gov.in', '.nic.in', '.org.in', '.edu.in', 'google.com/search'];
+      
+      let isValidGovLink = false;
+      try {
+        const parsedUrl = new URL(urlLower);
+        isValidGovLink = validTlds.some(tld => parsedUrl.hostname.endsWith(tld));
+      } catch(e) { /* invalid URL string */ }
+
+      // If it's not a verified Indian Government TLD, replace it with a Google Search fallback
+      if (!isValidGovLink) {
+        // e.g., 'pmkvyofficial.org' gets overridden here
+        const query = encodeURIComponent(scheme.name + " official website gov.in");
+        scheme.application_url = `https://www.google.com/search?q=${query}`;
       }
     }
 
