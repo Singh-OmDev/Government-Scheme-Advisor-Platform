@@ -9,7 +9,7 @@ const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 const cache = new Map();
 const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 Hours
 
-async function recommendSchemes(userProfile, language = 'en') {
+async function recommendSchemes(userProfile, language = 'en', excludeSchemes = []) {
   const isHindi = language === 'hi';
 
   // Clean profile for cache key
@@ -33,6 +33,10 @@ async function recommendSchemes(userProfile, language = 'en') {
   }
 
   const systemPrompt = "You are a helpful AI assistant that outputs strictly valid JSON. Do NOT output any text, markdown, or explanations outside of the JSON object.";
+
+  const excludeText = excludeSchemes.length > 0 
+    ? `\n    5. CRITICAL: You MUST NOT return any of these specific schemes: ${JSON.stringify(excludeSchemes)}. They have already been shown to the user. Find NEW relevant schemes.` 
+    : '';
 
   // Step 1: Get List of Scheme Names (Fast)
   // Requesting 15-20 relevant scheme names strictly.
@@ -58,8 +62,8 @@ async function recommendSchemes(userProfile, language = 'en') {
        - CATEGORY: If 'General', EXCLUDE schemes reserved EXCLUSIVELY for SC/ST/OBC/Minority. If user is SC/ST/OBC, INCLUDE specific schemes for them.
        - STATE (CRITICAL): State specific schemes MUST ONLY be for '${userProfile.state}'. NEVER include a state scheme for a different state. If you can't find state schemes, use Central schemes.
        - OCCUPATION: Prioritize schemes matching '${userProfile.occupation}'.
-    4. Do NOT force the list to 15 if there are not enough relevant schemes, but try to find valid State schemes first before filling with broad Central schemes.
-    5. Output STRICT JSON only.
+    4. Do NOT force the list to 15 if there are not enough relevant schemes, but try to find valid State schemes first before filling with broad Central schemes.${excludeText}
+    6. Output STRICT JSON only.
     
     JSON Structure:
     {
@@ -290,12 +294,16 @@ async function chatWithScheme(schemeDetails, userQuestion, language) {
   }
 }
 
-async function searchSchemes(query, language = 'en') {
+async function searchSchemes(query, language = 'en', excludeSchemes = []) {
   const isHindi = language === 'hi';
+
+  const excludeText = excludeSchemes.length > 0 
+    ? `\n    CRITICAL: You MUST NOT return any of these specific schemes: ${JSON.stringify(excludeSchemes)}. They have already been shown to the user. Find NEW relevant schemes.` 
+    : '';
 
   const prompt = `
     You are an expert government scheme advisor for India.
-    User is searching for authentic government schemes related to: "${query}"
+    User is searching for authentic government schemes related to: "${query}"${excludeText}
 
     Task:
     1. Identify ONLY REAL, OFFICIALLY EXISTING Central and State government schemes for India matching this keyword.

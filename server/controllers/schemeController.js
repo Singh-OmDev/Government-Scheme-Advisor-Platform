@@ -20,7 +20,8 @@ exports.getRecommendations = async (req, res) => {
         // 1. Get Recommendations (Independent of DB)
         let recommendations;
         try {
-            recommendations = await recommendSchemes(userProfile, language);
+            const excludeSchemes = userProfile.excludeSchemes || [];
+            recommendations = await recommendSchemes(userProfile, language, excludeSchemes);
         } catch (groqError) {
             console.error("Critical: Groq API failed:", groqError);
             return res.status(500).json({ error: "Failed to generate recommendations", details: groqError.message });
@@ -89,10 +90,10 @@ exports.getRecommendations = async (req, res) => {
  */
 exports.searchSchemes = async (req, res) => {
     try {
-        const { query, language } = req.body;
+        const { query, language, excludeSchemes } = req.body;
         if (!query) return res.status(400).json({ error: "Query is required" });
 
-        const results = await searchSchemes(query, language || 'en');
+        const results = await searchSchemes(query, language || 'en', excludeSchemes || []);
         res.json(results);
     } catch (error) {
         console.error("Search Endpoint Error:", error);

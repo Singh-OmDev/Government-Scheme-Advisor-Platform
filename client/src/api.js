@@ -72,7 +72,7 @@ export const chatWithScheme = async (scheme, question, language) => {
     }
 };
 
-export const searchSchemes = async (query, language, token) => {
+export const searchSchemes = async (query, language, token, excludeSchemes = []) => {
     try {
         const response = await fetch(`${API_URL}/search-schemes`, {
             method: 'POST',
@@ -80,7 +80,7 @@ export const searchSchemes = async (query, language, token) => {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify({ query, language }),
+            body: JSON.stringify({ query, language, excludeSchemes }),
         });
 
         if (!response.ok) {

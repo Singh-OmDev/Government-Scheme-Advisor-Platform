@@ -34,6 +34,8 @@ function HomePage() {
     });
 
     const [isLoading, setIsLoading] = useState(false);
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
+    const [hasMore, setHasMore] = useState(true);
     const [error, setError] = useState(null);
     const [language, setLanguage] = useState('en');
 
@@ -63,6 +65,7 @@ function HomePage() {
                 setSchemes(data.schemes);
                 setGeneralAdvice(data.generalAdvice || []);
                 setShowResults(true);
+                setHasMore(data.schemes.length > 0);
 
                 // Persist to Session Storage
                 sessionStorage.setItem('hs_schemes', JSON.stringify(data.schemes));
@@ -77,6 +80,34 @@ function HomePage() {
             setError("Failed to fetch recommendations. Please try again later.");
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    const handleLoadMore = async () => {
+        if (isLoadingMore || !userProfile) return;
+        setIsLoadingMore(true);
+        try {
+            const token = await getToken();
+            const excludeSchemes = schemes.map(s => s.name);
+            const data = await recommendSchemes({
+                ...userProfile,
+                language,
+                userId: user?.id,
+                excludeSchemes
+            }, token);
+            
+            if (data.schemes && data.schemes.length > 0) {
+                const newSchemes = [...schemes, ...data.schemes];
+                setSchemes(newSchemes);
+                sessionStorage.setItem('hs_schemes', JSON.stringify(newSchemes));
+            } else {
+                setHasMore(false);
+            }
+        } catch (err) {
+            console.error("Error loading more schemes:", err);
+            alert("Failed to load more schemes. Please try again.");
+        } finally {
+            setIsLoadingMore(false);
         }
     };
 
@@ -209,7 +240,26 @@ function HomePage() {
                     {showResults && (
                         <div id="results" className="scroll-mt-32 space-y-16 max-w-5xl mx-auto">
                             <SchemeAnalytics schemes={schemes} language={language} />
-                            <ResultsSection schemes={schemes} generalAdvice={generalAdvice} language={language} t={t} />
+                            
+                            <div>
+                                <ResultsSection schemes={schemes} generalAdvice={generalAdvice} language={language} t={t} />
+                                
+                                {hasMore && (
+                                    <div className="flex justify-center mt-10">
+                                        <button
+                                            onClick={handleLoadMore}
+                                            disabled={isLoadingMore}
+                                            className="px-8 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full font-medium transition-all text-white disabled:opacity-50 flex items-center gap-2 shadow-xl"
+                                        >
+                                            {isLoadingMore ? (
+                                                <><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span> Loading...</>
+                                            ) : (
+                                                "Load More Recommendations"
+                                            )}
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
 
                             <div className="border border-[#262626] bg-[#0a0a0a] p-10 text-center relative overflow-hidden">
                                 <div className="absolute top-0 left-0 w-1 bg-[#f97316] h-full"></div>
