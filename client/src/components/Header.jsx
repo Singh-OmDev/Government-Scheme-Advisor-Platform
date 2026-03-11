@@ -36,12 +36,7 @@ const Header = ({ language, setLanguage, t }) => {
 
                 {/* Centered Navigation */}
                 <nav className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden md:flex items-center gap-2 bg-white/5 p-1.5 rounded-full border border-white/5 shadow-inner">
-                    <Link
-                        to="/dashboard"
-                        className={`px-6 py-2 text-base font-medium rounded-full transition-all duration-300 ${isActive('/dashboard') ? 'bg-white/10 text-white shadow-sm' : 'text-neutral-400 hover:text-white hover:bg-white/5'}`}
-                    >
-                        Insights
-                    </Link>
+
 
                     <SignedIn>
                         <Link

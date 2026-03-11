@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
-import AdminDashboard from '../components/AdminDashboard';
 import { translations } from '../translations';
 import { SignedIn } from '@clerk/clerk-react';
 import UserHistory from '../components/UserHistory';
@@ -19,8 +18,6 @@ const DashboardPage = () => {
                 <SignedIn>
                     <UserHistory language={language} />
                 </SignedIn>
-
-                <AdminDashboard language={language} />
             </main>
 
             <Footer />
