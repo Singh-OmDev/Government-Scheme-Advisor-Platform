@@ -295,20 +295,24 @@ async function searchSchemes(query, language = 'en') {
 
   const prompt = `
     You are an expert government scheme advisor for India.
-    User is searching for schemes related to: "${query}"
+    User is searching for authentic government schemes related to: "${query}"
 
     Task:
-    1. Identify the most relevant Central and State government schemes for this keyword.
-    2. Return a list of up to 10 schemes.
+    1. Identify ONLY REAL, OFFICIALLY EXISTING Central and State government schemes for India matching this keyword.
+    2. Return a list of up to 10 schemes. If no real schemes exist for this query, return an empty array.
     3. Output STRICT JSON format as defined below.
     4. ${isHindi ? 'Output mostly in HINDI, but keep keys in English.' : 'Output in English.'}
-    5. Be accurate. Do not hallucinate schemes.
+    5. CRITICAL: DO NOT HALLUCINATE SCHEME NAMES. Every scheme must be a verifiable government initiative.
+    6. PROVIDE OFFICIAL SOURCES (CRITICAL):
+       - \`application_url\` MUST be a verifiable official government link (MUST END with \`.gov.in\`, \`.nic.in\` or \`.org.in\`).
+       - DO NOT Hallucinate URLs.
+       - If you are not 100% certain of the official URL, YOU MUST output a Google Search link instead: \`https://www.google.com/search?q=\` + URL Encoded Scheme Name.
     
     JSON Structure:
     {
       "schemes": [
         {
-          "name": "Scheme Name",
+          "name": "Exact Official Scheme Name",
           "type": "Central or State",
           "state": "State Name",
           "categoryTags": ["Tag1", "Tag2"],
@@ -317,7 +321,7 @@ async function searchSchemes(query, language = 'en') {
           "requiredDocuments": ["Doc 1", "Doc 2"],
           "applicationSteps": ["Step 1", "Step 2"],
           "benefits": ["Benefit 1", "Benefit 2"],
-          "application_url": "URL or 'N/A'",
+          "application_url": "MUST be a valid official URL (e.g., .gov.in, .nic.in) or 'N/A'",
           "deadline": "YYYY-MM-DD or 'Open' or 'N/A'",
           "usefulnessScore": 90
         }
@@ -328,7 +332,7 @@ async function searchSchemes(query, language = 'en') {
   try {
     const completion = await groq.chat.completions.create({
       messages: [
-        { role: "system", content: "You are a helpful assistant that outputs strictly valid JSON." },
+        { role: "system", content: "You are a helpful assistant that outputs strictly valid JSON. Do not output any text or markdown outside of the JSON object." },
         { role: "user", content: prompt }
       ],
       model: "llama-3.1-8b-instant",
@@ -340,12 +344,27 @@ async function searchSchemes(query, language = 'en') {
     if (jsonString.includes("```")) {
       jsonString = jsonString.replace(/```json|```/g, "").trim();
     }
-    return JSON.parse(jsonString);
+    const parsedData = JSON.parse(jsonString);
+    
+    // 🚨 POST-PROCESSING FILTER (URL SANITIZATION)
+    if (parsedData.schemes && Array.isArray(parsedData.schemes)) {
+        parsedData.schemes = parsedData.schemes.map(scheme => {
+            // URL SANITIZATION (Prevent Hallucinations/Dead links entirely)
+            if (scheme.name) {
+                const searchQuery = encodeURIComponent(`${scheme.name} ${scheme.state || ''} official website apply online gov.in`);
+                scheme.application_url = `https://www.google.com/search?q=${searchQuery}`;
+            }
+            return scheme;
+        });
+    }
+
+    return parsedData;
 
   } catch (error) {
     console.error("Search API Error:", error);
     throw new Error("Failed to fetch search results");
   }
 }
+
 
 module.exports = { recommendSchemes, chatWithScheme, searchSchemes };
