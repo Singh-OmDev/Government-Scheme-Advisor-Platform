@@ -51,11 +51,12 @@ async function recommendSchemes(userProfile, language = 'en') {
     Task:
     1. Identify highly relevant government schemes (Central & State) for this user. Aim for 10-15 schemes.
     2. PRIORITY: You must prioritize **State-specific schemes** for '${userProfile.state}'. Aim for at least 40-50% schemes from this state if possible.
-    3. ELIGIBILITY CHECKS (CRITICAL):
-       - GENDER: If 'Male', EXCLUDE schemes for 'Women/Girls' (e.g., Sukanya Samriddhi, Ladli Behna).
-       - AGE: Ensure the user's age (${userProfile.age}) falls within the scheme's limits.
+    3. ELIGIBILITY CHECKS (CRITICAL AND MANDATORY):
+       - GENDER (ABSOLUTE RULE): If 'Male', you MUST NOT include ANY schemes for Women, Girls, Maternity, or Pregnancy. NO maternity benefit programs or schemes for females.
+       - AGE: Ensure the user's age (${userProfile.age}) strictly falls within the scheme's limits.
        - INCOME: If income is 'High' or exceeds limits, EXCLUDE BPL/EWS specific schemes.
-       - CATEGORY: If 'General', EXCLUDE schemes reserved for SC/ST/OBC.
+       - CATEGORY: If 'General', EXCLUDE schemes reserved EXCLUSIVELY for SC/ST/OBC/Minority. If user is SC/ST/OBC, INCLUDE specific schemes for them.
+       - STATE (CRITICAL): State specific schemes MUST ONLY be for '${userProfile.state}'. NEVER include a state scheme for a different state. If you can't find state schemes, use Central schemes.
        - OCCUPATION: Prioritize schemes matching '${userProfile.occupation}'.
     4. Do NOT force the list to 15 if there are not enough relevant schemes, but try to find valid State schemes first before filling with broad Central schemes.
     5. Output STRICT JSON only.
@@ -139,7 +140,11 @@ async function recommendSchemes(userProfile, language = 'en') {
       Rules:
       1. Output STRICT JSON only.
       2. Follow this structure EXACTLY: ${schemaStructure}
-      3. VERIFY ELIGIBILITY: Before generating details, verify if the user is truly eligible. If a scheme is clearly ineligible (wrong gender/age/category), do NOT return it in the array or replace it with a valid generic scheme.
+      3. VERIFY ELIGIBILITY: Before generating details, verify if the user is truly eligible. 
+         - CRITICAL: If Gender is 'Male', you MUST instantly reject ANY scheme related to maternity, pregnant women, or women's empowerment. 
+         - CRITICAL: Review the State. If the scheme is a State Scheme for a state OTHER THAN '${userProfile.state}', you MUST reject it.
+         - CRITICAL: Review Category. If the scheme is ONLY for SC/ST and user is '${userProfile.category}', verify match. 
+         If a scheme is clearly ineligible, do NOT return it in the array; omit it entirely.
       4. PROVIDE OFFICIAL SOURCES: application_url MUST be a real, verifiable link (ending in .gov.in, .nic.in, etc.) if online application is possible.
       5. ${isHindi ? 'Translate content to Hindi.' : 'Keep content in English.'}
       6. Ensure "name" matches the input name exactly.
@@ -180,8 +185,55 @@ async function recommendSchemes(userProfile, language = 'en') {
     };
   }
 
+  // 🚨 POST-PROCESSING FILTER (STRICT DEMOGRAPHIC ENFORCEMENT)
+  let filteredSchemes = allSchemes;
+  
+  filteredSchemes = allSchemes.filter(scheme => {
+    const schemeText = [
+      scheme.name,
+      scheme.description,
+      ...(scheme.categoryTags || []),
+      ...(scheme.eligibilitySummary || []),
+      scheme.state
+    ].join(' ').toLowerCase();
+
+    // 1. GENDER FILTER
+    if (userProfile.gender === 'Male') {
+      const femaleKeywords = ['maternity', 'pregnant', 'pregnancy', 'women', 'woman', 'girl', 'female', 'mother', 'ladies', 'beti', 'mahila', 'matritva', 'sukanya', 'kanya'];
+      if (femaleKeywords.some(keyword => schemeText.includes(keyword))) {
+        return false; // Drop female-centric schemes for males
+      }
+    } else if (userProfile.gender === 'Female') {
+      // Optional: if want to strictly block male-only schemes for females, though rare in India
+    }
+
+    // 2. STATE FILTER
+    // If it's a state scheme, it MUST be for the user's state OR "All States"/"Central"/"India"
+    const isCentralOrAll = ['all states', 'central', 'india', 'national', 'pan-india'].some(kw => scheme.state?.toLowerCase().includes(kw) || scheme.type?.toLowerCase().includes('central'));
+    const isUsersState = scheme.state?.toLowerCase().includes(userProfile.state.toLowerCase()) || schemeText.includes(userProfile.state.toLowerCase());
+    
+    if (scheme.type?.toLowerCase().includes('state')) {
+      if (!isUsersState && !isCentralOrAll) {
+         return false; // Drop schemes from other states
+      }
+    }
+
+    // 3. CASTE/CATEGORY FILTER (Basic Level)
+    if (userProfile.category === 'General') {
+      const scstKeywords = ['sc/st', 'scheduled caste', 'scheduled tribe', 'obc', 'backward class', 'minority only', 'minorities only'];
+      if (scstKeywords.some(keyword => schemeText.includes(keyword)) && 
+          !schemeText.includes('general') && !schemeText.includes('all categories')) {
+        return false; // Drop SC/ST/OBC exclusive schemes for General
+      }
+    }
+
+    return true; // Pass all filters
+  });
+
+  console.log(`Strict Filtering applied. Dropped ${allSchemes.length - filteredSchemes.length} ineligible schemes.`);
+
   const responseData = {
-    schemes: allSchemes,
+    schemes: filteredSchemes,
     generalAdvice: generalAdvice
   };
 
