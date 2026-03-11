@@ -230,23 +230,12 @@ async function recommendSchemes(userProfile, language = 'en') {
       }
     }
 
-    // 4. URL SANITIZATION (Prevent Hallucinations/Dead links)
-    if (scheme.application_url && scheme.application_url !== 'N/A') {
-      const urlLower = scheme.application_url.toLowerCase();
-      const validTlds = ['.gov.in', '.nic.in', '.org.in', '.edu.in', 'google.com/search'];
-      
-      let isValidGovLink = false;
-      try {
-        const parsedUrl = new URL(urlLower);
-        isValidGovLink = validTlds.some(tld => parsedUrl.hostname.endsWith(tld));
-      } catch(e) { /* invalid URL string */ }
-
-      // If it's not a verified Indian Government TLD, replace it with a Google Search fallback
-      if (!isValidGovLink) {
-        // e.g., 'pmkvyofficial.org' gets overridden here
-        const query = encodeURIComponent(scheme.name + " official website gov.in");
-        scheme.application_url = `https://www.google.com/search?q=${query}`;
-      }
+    // 4. URL SANITIZATION (Prevent Hallucinations/Dead links entirely)
+    // Since AI can generate valid TLDs (.nic.in) with dead subdomains (e.g., bslrm.bih.nic.in),
+    // we will route ALL application links through a reliable Google Search query to guarantee they never hit a dead page.
+    if (scheme.name) {
+      const query = encodeURIComponent(`${scheme.name} ${scheme.state || ''} official website apply online gov.in`);
+      scheme.application_url = `https://www.google.com/search?q=${query}`;
     }
 
     return true; // Pass all filters
